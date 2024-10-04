@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet"> <!-- Changed Font -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif; /* Updated Font */
+            background-color: #f0f0f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        header img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            font-weight: 700;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        form {
+            max-width: 400px;
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        label {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #444;
+            font-weight: bold;
+            display: block;
+        }
+
+        input {
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            width: 100%;
+            font-size: 1em;
+            margin-bottom: 20px;
+            background-color: #f1f1f1;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        input:focus {
+            background-color: #fff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(90deg, #2575fc, #6a11cb);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        #recommendations {
+            display: none;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease-in-out;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        #recommendations h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #6a11cb;
+        }
+
+        #movieList {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .movie {
+            flex: 1;
+            max-width: 180px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .movie img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .movie-title {
+            font-size: 1.2em;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .movie:hover {
+            transform: scale(1.05);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            border: 6px solid #f3f3f3; /* Light grey */
+            border-top: 6px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto; /* Center it */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://media.discordapp.net/attachments/762217947015020548/1291363696643411999/360_F_133443361_CFWR0cAYXAItwh3njbYKXBfKazNQda3f-removebg-preview.png?ex=66ffd3a9&is=66fe8229&hm=ca4837ca4a6d337ea6f87747da1a1ead5cc02456b921ba4e2dd6c78713541cc4&=&format=webp&quality=lossless&width=165&height=172" alt="Logo">
+        <h1>Movie Recommendation System</h1>
+    </header>
+
+    <main>
+        <form id="recommendForm">
+            <label for="title">Enter Movie Title</label>
+            <input type="text" id="title" name="title" placeholder="search" required>
+            <button type="submit">Get Recommendations</button>
+            <div class="spinner" id="spinner"></div> <!-- Spinner -->
+        </form>
+    </main>
+
+    <div id="recommendations">
+        <h2>Recommended Movies</h2>
+        <div id="movieList"></div>
+        <p id="errorMessage" style="color: red;"></p> <!-- Error message -->
+    </div>
+
+    <script>
+        const API_KEY = 'b9e2fb416fb930b0571f0f7953b58764';  // Your TMDB API key
+        const BASE_URL = 'https://api.themoviedb.org/3';
+
+        document.getElementById('recommendForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const movieTitle = document.getElementById('title').value;
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block'; // Show spinner
+
+            document.getElementById('recommendForm').style.display = 'none'; // Hide the form
+
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: movieTitle })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const movieList = document.getElementById('movieList');
+                movieList.innerHTML = '';  // Clear previous recommendations
+                document.getElementById('errorMessage').innerText = ''; // Clear error message
+
+                if (data.recommendations && data.recommendations.length > 0) {
+                    // Show the recommendations section
+                    document.getElementById('recommendations').style.display = 'block';
+                    data.recommendations.forEach(movie => {
+                        fetchMovieDetails(movie);
+                    });
+                } else {
+                    document.getElementById('errorMessage').innerText = 'No recommendations found.';
+                }
+            })
+            .catch(error => {
+                document.getElementById('errorMessage').innerText = 'Error fetching recommendations.';
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                spinner.style.display = 'none'; // Hide spinner
+            });
+        });
+
+        function fetchMovieDetails(movieTitle) {
+            // Fetch movie details from TMDB API
+            fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${movieTitle}`)
+                .then(response => response.json())
+                .then(data => {
+                    const movie = data.results[0];  // Get the first result
+
+                    if (movie) {
+                        const movieList = document.getElementById('movieList');
+
+                        const movieDiv = document.createElement('div');
+                        movieDiv.classList.add('movie');
+
+                        const movieImg = document.createElement('img');
+                        movieImg.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+
+                        const movieTitleDiv = document.createElement('div');
+                        movieTitleDiv.classList.add('movie-title');
+                        movieTitleDiv.innerText = movie.title;
+
+                        movieDiv.appendChild(movieImg);
+                        movieDiv.appendChild(movieTitleDiv);
+                        movieList.appendChild(movieDiv);
+                    }
+                })
+                .catch(error => console.error('Error fetching movie details:', error));
+        }
+    </script>
+
+</body>
+</html>
